@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ГОСУДАРСТВО - Симулятор управления</title>
+  <meta name="description" content="Игра-симулятор управления государством в стиле Lapse. Принимайте решения свайпами и влияйте на показатели страны.">
+  <meta name="keywords" content="симулятор, игра, государство, управление, решения, политика">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="ГОСУДАРСТВО - Симулятор управления">
+  <meta property="og:description" content="Игра-симулятор управления государством в стиле Lapse">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://ElenaSamanchuk.github.io/simulator/">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/simulator/favicon.ico">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="/simulator/styles/globals.css" as="style">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/App.tsx"></script>
+</body>
+</html>
+
+        <!-- Main Game Container -->
+        <div class="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full relative">
+            <!-- Background Gradient -->
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+            
+            <!-- Game Header -->
+            <header id="game-header" class="relative z-10 flex flex-col lg:flex-row items-center justify-between p-3 lg:p-6 bg-card/80 backdrop-blur-sm border-b border-border/50">
+                <!-- Game Title and Progress -->
+                <div class="flex flex-col lg:flex-row items-center gap-2 lg:gap-6 w-full lg:w-auto">
+                    <h1 class="text-lg lg:text-xl font-mono font-bold text-primary uppercase tracking-wider">
+                        ГОСУДАРСТВО
+                    </h1>
+                    
+                    <!-- Progress Info -->
+                    <div class="flex flex-col lg:flex-row items-center gap-2 lg:gap-4 text-sm">
+                        <div class="flex items-center gap-2 text-muted-foreground font-mono">
+                            <span>Срок:</span>
+                            <span id="current-term" class="text-primary font-bold">1</span>
+                            <span>/</span>
+                            <span id="max-terms">5</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 text-muted-foreground font-mono">
+                            <span>Решение:</span>
+                            <span id="current-decision" class="text-primary font-bold">1</span>
+                            <span>/</span>
+                            <span id="total-decisions">50</span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 text-muted-foreground font-mono">
+                            <span>Сложность:</span>
+                            <span id="difficulty-name" class="text-accent-foreground font-bold">Стабильность</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bars -->
+                <div class="flex flex-col gap-2 w-full lg:w-auto mt-3 lg:mt-0">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-muted-foreground font-mono min-w-16">Срок:</span>
+                        <div class="flex-1 lg:w-32 h-2 bg-secondary/30 rounded-full overflow-hidden">
+                            <div id="term-progress" class="h-full bg-gradient-to-r from-primary to-accent transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-muted-foreground font-mono min-w-16">Общий:</span>
+                        <div class="flex-1 lg:w-32 h-2 bg-secondary/30 rounded-full overflow-hidden">
+                            <div id="overall-progress" class="h-full bg-gradient-to-r from-accent to-primary transition-all duration-300 ease-out" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="flex items-center gap-2 lg:gap-3 mt-3 lg:mt-0">
+                    <button id="sound-toggle" class="p-2 lg:p-3 bg-card hover:bg-accent transition-colors rounded-lg border border-border/30 text-muted-foreground hover:text-foreground">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                            <path id="sound-icon" d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416c.363 0 .706.141.963.397l3.384 3.383A.705.705 0 0 0 11 19.298V4.702ZM16 9a5 5 0 0 1 0 6m2-8a9 9 0 0 1 0 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    
+                    <button id="theme-toggle" class="p-2 lg:p-3 bg-card hover:bg-accent transition-colors rounded-lg border border-border/30 text-muted-foreground hover:text-foreground">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                            <path id="theme-icon" d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    
+                    <button id="restart-button" class="hidden p-2 lg:p-3 bg-destructive hover:bg-destructive/80 text-destructive-foreground transition-colors rounded-lg border border-border/30 font-mono font-bold text-sm">
+                        RESTART
+                    </button>
+                </div>
+            </header>
+
+            <!-- Main Game Area -->
+            <main class="flex-1 flex flex-col lg:grid lg:grid-cols-[280px_1fr_280px] gap-2 lg:gap-6 p-2 lg:p-6 min-h-0 overflow-hidden max-w-full">
+                
+                <!-- Mobile Stats Toggle -->
+                <div class="lg:hidden relative z-30">
+                    <button id="mobile-stats-toggle" class="w-full mb-2 p-2 bg-card/60 backdrop-blur-sm border border-border/30 rounded-lg flex items-center justify-between text-sm font-mono hover:bg-card/80 transition-colors">
+                        <span class="text-primary font-bold">ПОКАЗАТЕЛИ</span>
+                        <span id="mobile-stats-arrow" class="transform transition-transform">⬇️</span>
+                    </button>
+                    
+                    <!-- Mobile Stats Panel -->
+                    <div id="mobile-stats-panel" class="hidden mb-4 p-3 bg-card/95 backdrop-blur-md border border-border/50 rounded-lg space-y-4 relative z-40 shadow-xl">
+                        <!-- Main Stats Grid -->
+                        <div id="mobile-stats-grid" class="grid grid-cols-2 gap-3">
+                            <!-- Stats will be populated by JS -->
+                        </div>
+                        
+                        <!-- Overall Balance -->
+                        <div id="mobile-overall-balance">
+                            <!-- Balance indicator will be populated by JS -->
+                        </div>
+                        
+                        <!-- Corruption and Popularity -->
+                        <div class="grid grid-cols-2 gap-3 text-sm">
+                            <div class="flex flex-col p-3 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs mb-1">Коррупция:</span>
+                                <span id="mobile-corruption" class="font-bold text-base">0%</span>
+                            </div>
+                            <div class="flex flex-col p-3 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs mb-1">Популярность:</span>
+                                <span id="mobile-popularity" class="font-bold text-base">50%</span>
+                            </div>
+                        </div>
+
+                        <!-- Active Effects -->
+                        <div id="mobile-effects-section" class="hidden space-y-3">
+                            <div class="flex items-center gap-2 pb-2 border-b border-border/30">
+                                <div class="w-4 h-4 text-primary">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">Активные эффекты</h3>
+                            </div>
+                            <div id="mobile-effects-container" class="p-3 bg-card/40 backdrop-blur-sm border border-border/30 rounded-lg">
+                                <!-- Effects will be populated by JS -->
+                            </div>
+                        </div>
+
+                        <!-- Game Statistics -->
+                        <div class="space-y-2">
+                            <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">Статистика</h3>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <div class="flex justify-between p-2 bg-secondary/20 rounded border border-border/10">
+                                    <span class="text-muted-foreground">Решений:</span>
+                                    <span id="mobile-decisions-count" class="font-bold text-primary">0</span>
+                                </div>
+                                <div class="flex justify-between p-2 bg-secondary/20 rounded border border-border/10">
+                                    <span class="text-muted-foreground">События:</span>
+                                    <span id="mobile-events-count" class="font-bold text-primary">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Left Panel - Desktop Stats -->
+                <div class="hidden lg:block lg:col-start-1">
+                    <div class="bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 space-y-4">
+                        <div class="flex items-center gap-3 pb-3 border-b border-border/30">
+                            <div class="w-5 h-5 text-primary">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M7 8h10M7 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-foreground font-mono text-sm">СТАТИСТИКА</h2>
+                                <span class="text-muted-foreground text-xs">государства</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Desktop Stats Grid -->
+                        <div id="desktop-stats-grid" class="space-y-3">
+                            <!-- Stats will be populated by JS -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Center - Game Card Area -->
+                <div class="flex-1 flex flex-col gap-2 lg:gap-4 min-h-0 lg:col-start-2 relative z-10">
+                    <!-- Advisor Context -->
+                    <div id="advisor-context" class="bg-card/60 backdrop-blur-sm border border-border/30 rounded-lg p-2 lg:p-3 flex items-center gap-2 lg:gap-3">
+                        <div id="advisor-avatar" class="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 border-2 border-primary/30 flex items-center justify-center text-xl lg:text-2xl font-bold backdrop-blur-sm">
+                            👤
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div id="advisor-name" class="text-xs lg:text-sm font-mono text-primary font-bold truncate">
+                                Советник
+                            </div>
+                            <div id="advisor-phrase" class="text-xs text-muted-foreground italic leading-tight break-words">
+                                "Готов служить государству"
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Game Card Container -->
+                    <div class="flex-1 flex items-center justify-center relative min-h-0 max-w-full">
+                        <!-- Streak Indicator -->
+                        <div id="streak-indicator" class="hidden absolute top-2 lg:top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 lg:px-6 lg:py-3 rounded-2xl font-mono font-bold text-sm lg:text-base shadow-lg animate-pulse z-10 max-w-[90vw] text-center whitespace-nowrap">
+                            🔥 STREAK x<span id="streak-count">3</span>
+                        </div>
+
+                        <!-- Random Event Notification -->
+                        <div id="random-event-notification" class="hidden absolute bottom-full left-1/2 transform -translate-x-1/2 mb-4 bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 py-3 lg:px-6 lg:py-3 rounded-2xl font-mono font-bold text-sm lg:text-base shadow-lg animate-bounce z-20 max-w-[90vw] lg:max-w-md text-center leading-tight break-words">
+                            <span class="block">⚠️</span>
+                            <span id="event-text" class="block mt-1">Случайное событие</span>
+                        </div>
+
+                        <!-- Main Game Card -->
+                        <div id="game-card" class="w-full max-w-sm lg:max-w-md bg-card/90 backdrop-blur-md border border-border/50 rounded-2xl shadow-2xl overflow-hidden transition-all duration-150 ease-out transform relative">
+                            <!-- Card Content -->
+                            <div class="p-4 lg:p-6 space-y-4">
+                                <!-- Decision Title -->
+                                <div class="text-center">
+                                    <h3 id="decision-title" class="text-lg lg:text-xl font-bold text-foreground mb-2 leading-tight">
+                                        Заголовок решения
+                                    </h3>
+                                    <div id="decision-description" class="text-sm lg:text-base text-muted-foreground leading-relaxed">
+                                        Описание решения, которое необходимо принять
+                                    </div>
+                                </div>
+
+                                <!-- Choice Buttons -->
+                                <div class="space-y-3">
+                                    <button id="left-choice" class="w-full p-3 lg:p-4 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-xl text-left transition-all duration-200 group text-sm lg:text-base">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1">
+                                                <div class="font-semibold text-red-400 mb-1">❌ ОТКЛОНИТЬ</div>
+                                                <div id="left-choice-text" class="text-muted-foreground leading-relaxed">
+                                                    Текст левого выбора
+                                                </div>
+                                            </div>
+                                            <div id="left-choice-effects" class="flex flex-wrap gap-1">
+                                                <!-- Effect indicators will be added by JS -->
+                                            </div>
+                                        </div>
+                                    </button>
+
+                                    <button id="right-choice" class="w-full p-3 lg:p-4 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 rounded-xl text-left transition-all duration-200 group text-sm lg:text-base">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <div class="flex-1">
+                                                <div class="font-semibold text-green-400 mb-1">✅ ПРИНЯТЬ</div>
+                                                <div id="right-choice-text" class="text-muted-foreground leading-relaxed">
+                                                    Текст правого выбора
+                                                </div>
+                                            </div>
+                                            <div id="right-choice-effects" class="flex flex-wrap gap-1">
+                                                <!-- Effect indicators will be added by JS -->
+                                            </div>
+                                        </div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Swipe Indicators -->
+                            <div id="swipe-left-indicator" class="absolute inset-0 bg-red-500/20 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-150">
+                                <div class="text-6xl text-red-500">❌</div>
+                            </div>
+                            <div id="swipe-right-indicator" class="absolute inset-0 bg-green-500/20 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-150">
+                                <div class="text-6xl text-green-500">✅</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Control Hints -->
+                    <div class="flex flex-col gap-2 lg:gap-3 items-center">
+                        <div class="flex gap-2 lg:gap-4 flex-wrap justify-center">
+                            <div class="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 font-mono text-xs lg:text-sm">
+                                <kbd class="bg-red-500/20 text-red-500 px-1 lg:px-2 py-0.5 lg:py-1 rounded text-xs font-semibold border border-red-500/30 min-w-4 lg:min-w-6 text-center">←</kbd>
+                                <span class="hidden sm:inline whitespace-nowrap">Отклонить</span>
+                            </div>
+                            <div class="flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-2 bg-green-500/10 border border-green-500/20 rounded-lg text-green-500 font-mono text-xs lg:text-sm">
+                                <kbd class="bg-green-500/20 text-green-500 px-1 lg:px-2 py-0.5 lg:py-1 rounded text-xs font-semibold border border-green-500/30 min-w-4 lg:min-w-6 text-center">→</kbd>
+                                <span class="hidden sm:inline whitespace-nowrap">Принять</span>
+                            </div>
+                            <div id="restart-hint" class="hidden flex items-center gap-1 lg:gap-2 px-2 lg:px-3 py-1 lg:py-2 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-500 font-mono text-xs lg:text-sm">
+                                <kbd class="bg-blue-500/20 text-blue-500 px-1 lg:px-2 py-0.5 lg:py-1 rounded text-xs font-semibold border border-blue-500/30 min-w-4 lg:min-w-6 text-center">R</kbd>
+                                <span class="hidden sm:inline whitespace-nowrap">Перезапуск</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Panel - Effects and Countries -->
+                <div class="hidden lg:block bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-4 lg:col-start-3 space-y-4 max-h-full">
+                    <div class="space-y-4 h-full overflow-y-auto overflow-x-visible">
+                        <!-- Overall Balance -->
+                        <div id="desktop-overall-balance">
+                            <!-- Balance indicator will be populated by JS -->
+                        </div>
+                        
+                        <!-- Active Effects -->
+                        <div id="desktop-effects-section" class="hidden space-y-3">
+                            <div class="flex items-center gap-2 pb-2 border-b border-border/30">
+                                <div class="w-4 h-4 text-primary">
+                                    <svg viewBox="0 0 24 24" fill="none">
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                        <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </div>
+                                <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">
+                                    Активные эффекты
+                                </h3>
+                            </div>
+                            <div id="desktop-effects-container" class="p-3 bg-card/40 backdrop-blur-sm border border-border/30 rounded-lg">
+                                <!-- Effects will be populated by JS -->
+                            </div>
+                        </div>
+                        
+                        <!-- Game Statistics -->
+                        <div class="flex items-center gap-3 pb-3 border-b border-border/30">
+                            <div class="w-4 h-4 text-primary">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.87653 6.85425 4.02405 7.04 4.21L7.1 4.27C7.33568 4.50054 7.63502 4.65519 7.95941 4.714C8.28381 4.77282 8.61838 4.73312 8.92 4.6H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.29C19.896 4.47575 20.0435 4.69632 20.1441 4.93912C20.2448 5.18192 20.2966 5.44217 20.2966 5.705C20.2966 5.96783 20.2448 6.22808 20.1441 6.47088C20.0435 6.71368 19.896 6.93425 19.71 7.12L19.65 7.18C19.4195 7.41568 19.2648 7.71502 19.206 8.03941C19.1472 8.36381 19.1869 8.69838 19.32 9V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" 
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-semibold text-foreground font-mono text-sm">СТАТИСТИКА</h3>
+                                <span class="text-muted-foreground text-xs">игры</span>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs">Решений:</span>
+                                <span id="desktop-decisions-count" class="font-semibold font-mono text-xs text-primary">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs">События:</span>
+                                <span id="desktop-events-count" class="font-semibold font-mono text-xs text-primary">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs">Коррупция:</span>
+                                <span id="desktop-corruption" class="font-semibold font-mono text-xs">0%</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-secondary/30 rounded-lg border border-border/20">
+                                <span class="text-muted-foreground text-xs">Популярность:</span>
+                                <span id="desktop-popularity" class="font-semibold font-mono text-xs">50%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Game End Dialog -->
+        <div id="game-end-dialog" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div class="bg-card border border-border rounded-2xl shadow-2xl w-full max-w-md space-y-6 p-6">
+                <div class="text-center space-y-2">
+                    <div id="end-dialog-icon" class="text-6xl">🏆</div>
+                    <h2 id="end-dialog-title" class="text-2xl font-bold text-foreground">ПОБЕДА!</h2>
+                    <p id="end-dialog-subtitle" class="text-muted-foreground">Вы успешно управляли государством</p>
+                </div>
+                
+                <div id="end-dialog-stats" class="space-y-3">
+                    <!-- Final stats will be populated by JS -->
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="close-dialog-button" class="flex-1 p-3 bg-secondary text-secondary-foreground rounded-lg font-mono font-bold transition-colors hover:bg-secondary/80">
+                        ЗАКРЫТЬ
+                    </button>
+                    <button id="restart-dialog-button" class="flex-1 p-3 bg-primary text-primary-foreground rounded-lg font-mono font-bold transition-colors hover:bg-primary/80">
+                        ЗАНОВО
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/constants.js"></script>
+    <script src="js/gameData.js"></script>
+    <script src="js/randomEvents.js"></script>
+    <script src="js/countries.js"></script>
+    <script src="js/gameState.js"></script>
+    <script src="js/soundSystem.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
