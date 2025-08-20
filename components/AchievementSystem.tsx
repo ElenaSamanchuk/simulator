@@ -149,23 +149,11 @@ export function AchievementSystem({ achievements }: AchievementSystemProps) {
             
             {/* Прогресс-бар автоскрытия */}
             <div className="mt-3 w-full h-1 bg-white/10 rounded-full overflow-hidden">
-              <div 
-                className={`h-full ${style.text} bg-current rounded-full animate-[shrink_5s_linear_forwards]`}
-                style={{
-                  animation: 'shrink 5s linear forwards'
-                }}
-              />
+              <div className={`h-full ${style.text} bg-current rounded-full achievement-progress-bar`} />
             </div>
           </div>
         );
       })}
-      
-      <style jsx>{`
-        @keyframes shrink {
-          from { width: 100%; }
-          to { width: 0%; }
-        }
-      `}</style>
     </div>
   );
 }

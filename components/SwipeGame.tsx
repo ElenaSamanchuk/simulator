@@ -38,7 +38,9 @@ const CONSTANTS = {
 // Хук для управления локальным состоянием игры
 const useLocalGameState = () => {
   const [isDarkTheme, setIsDarkTheme] = useState(() => {
-    return localStorage.getItem('game-theme') === 'dark';
+    // По умолчанию темная тема, если ничего не сохранено
+    const saved = localStorage.getItem('game-theme');
+    return saved ? saved === 'dark' : true;
   });
   
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
@@ -198,12 +200,12 @@ export default function SwipeGame() {
     document.documentElement.classList.toggle('dark', savedTheme === 'dark');
   }, []);
 
-  // Обработка окончания игры
+  // Обработка окончания игры - ИСПРАВЛЕНО: не показываем диалог сразу
   useEffect(() => {
-    if (gameState.gameOver || gameState.gameWon) {
+    if ((gameState.gameOver || gameState.gameWon) && gameState.gameStats.totalDecisions > 0) {
       if (localState.isSoundEnabled) {
         setTimeout(() => {
-          SoundSystem[gameState.gameWon ? 'victory' : 'defeat']();
+          gameState.gameWon ? SoundSystem.victory() : SoundSystem.defeat();
         }, 500);
       }
 
@@ -212,7 +214,7 @@ export default function SwipeGame() {
       }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [gameState.gameOver, gameState.gameWon, localState.isSoundEnabled]);
+  }, [gameState.gameOver, gameState.gameWon, gameState.gameStats.totalDecisions, localState.isSoundEnabled]);
 
   // Обработка случайных событий
   useEffect(() => {
@@ -264,7 +266,7 @@ export default function SwipeGame() {
       
       // Звуковые эффекты
       if (localState.isSoundEnabled) {
-        SoundSystem[isLeftChoice ? 'swipeLeft' : 'swipeRight']();
+        isLeftChoice ? SoundSystem.swipeLeft() : SoundSystem.swipeRight();
         
         if (localState.streakCount >= CONSTANTS.STREAK_THRESHOLD) {
           setTimeout(() => SoundSystem.notification(), 100);
@@ -839,14 +841,17 @@ export default function SwipeGame() {
         </div>
       </main>
       
-      <GameEndDialog 
-        open={localState.showEndDialog}
-        onOpenChange={localState.setShowEndDialog}
-        gameStats={gameState.gameStats}
-        finalStats={gameState.stats}
-        isVictory={gameState.gameWon}
-        onRestart={handleRestart}
-      />
+      {/* ИСПРАВЛЕНО: Диалог окончания игры показывается только когда игра действительно закончена */}
+      {(gameState.gameOver || gameState.gameWon) && (
+        <GameEndDialog
+          open={localState.showEndDialog}
+          onOpenChange={localState.setShowEndDialog}
+          gameStats={gameState.gameStats}
+          finalStats={gameState.stats}
+          isVictory={gameState.gameWon}
+          onRestart={handleRestart}
+        />
+      )}
     </div>
   );
 }

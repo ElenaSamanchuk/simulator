@@ -1,31 +1,496 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>ГОСУДАРСТВО - Симулятор управления</title>
-  <meta name="description" content="Игра-симулятор управления государством в стиле Lapse. Принимайте решения свайпами и влияйте на показатели страны.">
-  <meta name="keywords" content="симулятор, игра, государство, управление, решения, политика">
-  
-  <!-- Open Graph -->
-  <meta property="og:title" content="ГОСУДАРСТВО - Симулятор управления">
-  <meta property="og:description" content="Игра-симулятор управления государством в стиле Lapse">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://ElenaSamanchuk.github.io/simulator/">
-  
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/simulator/favicon.ico">
-  
-  <!-- Preload critical resources -->
-  <link rel="preload" href="/simulator/styles/globals.css" as="style">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Государственный симулятор 2077</title>
+    <meta name="description" content="Управляйте государством в стиле киберпанк. Принимайте решения свайпами, влияйте на показатели страны.">
+    
+    <!-- PWA и мобильная оптимизация -->
+    <meta name="theme-color" content="#0a0b1e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- Подключаем оригинальный globals.css из React версии -->
+    <link rel="stylesheet" href="styles/globals.css">
+    
+    <!-- Tailwind CSS для дополнительной поддержки -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#0a0b1e',
+                        foreground: '#e5e7eb',
+                        card: '#1e1b31',
+                        'card-foreground': '#e5e7eb',
+                        popover: '#1e1b31',
+                        'popover-foreground': '#e5e7eb',
+                        primary: '#3b82f6',
+                        'primary-foreground': '#ffffff',
+                        secondary: '#374151',
+                        'secondary-foreground': '#e5e7eb',
+                        muted: '#374151',
+                        'muted-foreground': '#9ca3af',
+                        accent: '#8b5cf6',
+                        'accent-foreground': '#ffffff',
+                        destructive: '#ef4444',
+                        'destructive-foreground': '#ffffff',
+                        border: '#374151',
+                        input: '#374151',
+                        ring: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link rel="icon" href="public/favicon.svg" type="image/svg+xml">
 </head>
-<body>
-  <div id="root"></div>
-  <script type="module" src="/App.tsx"></script>
+<body class="no-select">
+    <!-- Основной контейнер - точная копия App.tsx -->
+    <div class="w-full h-screen overflow-hidden bg-background text-foreground game-container no-select">
+        <!-- Главный контейнер SwipeGame -->
+        <div id="gameContainer" class="h-screen flex flex-col bg-background text-foreground overflow-hidden max-w-full relative">
+            <!-- Фоновый градиент -->
+            <div class="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none"></div>
+            
+            <!-- Система достижений -->
+            <div id="achievementSystem" class="fixed top-4 right-2 lg:right-4 z-50 space-y-3 max-w-[90vw] lg:max-w-sm pointer-events-none"></div>
+            
+            <!-- GameHeader компонент -->
+            <header id="gameHeader" class="flex-shrink-0 bg-secondary/80 backdrop-blur-md border-b border-border/50 relative z-10">
+                <div class="flex justify-between items-center p-4 lg:px-6 gap-4 max-w-full">
+                    <!-- Логотип и название -->
+                    <div class="flex items-center gap-4 min-w-0 flex-1">
+                        <div class="flex-shrink-0">
+                            <!-- FuturisticLogo из GameHeader -->
+                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" class="text-primary">
+                                <circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.3"/>
+                                <path d="M20 4L32 12V28L20 36L8 28V12L20 4Z" stroke="currentColor" stroke-width="2" fill="none"/>
+                                <path d="M20 8L28 14V26L20 32L12 26V14L20 8Z" fill="currentColor" opacity="0.2"/>
+                                <circle cx="20" cy="20" r="6" fill="currentColor" opacity="0.8"/>
+                                <circle cx="20" cy="20" r="3" fill="currentColor"/>
+                                <circle cx="20" cy="8" r="2" fill="currentColor" opacity="0.6">
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite"/>
+                                </circle>
+                                <circle cx="32" cy="20" r="2" fill="currentColor" opacity="0.6">
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="0.5s"/>
+                                </circle>
+                                <circle cx="20" cy="32" r="2" fill="currentColor" opacity="0.6">
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="1s"/>
+                                </circle>
+                                <circle cx="8" cy="20" r="2" fill="currentColor" opacity="0.6">
+                                    <animate attributeName="opacity" values="0.6;1;0.6" dur="2s" repeatCount="indefinite" begin="1.5s"/>
+                                </circle>
+                                <path d="M20 14L20 8M26 20L32 20M20 26L20 32M14 20L8 20" stroke="currentColor" stroke-width="1" opacity="0.4"/>
+                                <path d="M16 16L24 24M24 16L16 24" stroke="currentColor" stroke-width="1.5" opacity="0.7"/>
+                            </svg>
+                        </div>
+                        <div class="min-w-0">
+                            <h1 class="text-lg lg:text-xl font-bold text-primary font-mono tracking-tight leading-tight">
+                                ГОСУДАРСТВЕННЫЙ СИМУЛЯТОР 2077
+                            </h1>
+                            <div class="text-xs text-muted-foreground font-mono mt-0.5 hidden sm:block">
+                                Принимайте решения • Управляйте балансом • Спасите нацию
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Кнопки управления - убрана кнопка темы -->
+                    <div class="flex gap-2 flex-shrink-0">
+                        <button id="restartBtn" class="hidden w-10 h-10 flex items-center justify-center relative group bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-md transition-all duration-200 hover:scale-105" title="Новая игра">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                <path d="M10 3V7L14 3H10Z" fill="currentColor"/>
+                                <path d="M10 3C6.134 3 3 6.134 3 10C3 13.866 6.134 17 10 17C13.866 17 17 13.866 17 10C17 8.915 16.74 7.894 16.28 7" 
+                                      stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <div class="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse group-hover:animate-bounce"></div>
+                        </button>
+                        
+                        <button id="soundToggle" class="w-10 h-10 flex items-center justify-center border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md transition-all duration-200 hover:scale-105" title="Отключить звук">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                                <path d="M11 5L6 8H2V12H6L11 15V5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M15.54 8.46C16.4776 9.39764 17.0039 10.6692 17.0039 11.995C17.0039 13.3208 16.4776 14.5924 15.54 15.53" 
+                                      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Прогресс игры - общий баланс вместо сложности -->
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-8 p-3 px-4 lg:px-6 bg-muted/30 border-t border-border/30">
+                    <div class="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                        <div id="termDisplay" class="text-sm text-muted-foreground font-mono font-medium whitespace-nowrap">
+                            Срок 1/5
+                        </div>
+                        <div class="w-24 h-2.5 bg-background/50 rounded-full overflow-hidden border border-border/20 shadow-inner">
+                            <div id="termProgress" class="h-full bg-gradient-to-r from-primary via-blue-500 to-cyan-400 transition-all duration-700 rounded-full shadow-sm" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3 min-w-0 w-full sm:w-auto">
+                        <div id="decisionDisplay" class="text-sm text-muted-foreground font-mono font-medium whitespace-nowrap">
+                            Решение 1/50
+                        </div>
+                        <div class="w-24 h-2.5 bg-background/50 rounded-full overflow-hidden border border-border/20 shadow-inner">
+                            <div id="overallProgress" class="h-full bg-gradient-to-r from-green-500 via-emerald-400 to-primary transition-all duration-700 rounded-full shadow-sm" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Общий баланс вместо сложности -->
+                    <div class="flex items-center gap-2 ml-auto">
+                        <div id="balanceIndicator" class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-sm text-muted-foreground font-mono">Баланс:</span>
+                        <span id="overallBalanceDisplay" class="text-sm text-green-400 font-mono font-semibold uppercase tracking-wide">
+                            СТАБИЛЬНОСТЬ
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Основная область игры -->
+            <main class="flex-1 flex flex-col lg:grid lg:grid-cols-[280px_1fr_320px] gap-2 lg:gap-6 p-2 lg:p-6 min-h-0 overflow-hidden max-w-full">
+                
+                <!-- Мобильная панель статистик -->
+                <div class="lg:hidden relative z-30">
+                    <button id="mobileStatsToggle" class="w-full mb-2 p-2 bg-card/60 backdrop-blur-sm border border-border/30 rounded-lg flex items-center justify-between text-sm font-mono hover:bg-card/80 transition-colors relative z-30">
+                        <span class="text-primary font-bold">ПОКАЗАТЕЛИ</span>
+                        <span id="mobileStatsArrow" class="transform transition-transform">⬇️</span>
+                    </button>
+                    <div id="mobileStatsContent" class="hidden mb-4 p-3 bg-card/95 backdrop-blur-md border border-border/50 rounded-lg space-y-4 relative z-40 shadow-xl"></div>
+                </div>
+
+                <!-- Левая панель - только статистики государства -->
+                <div class="hidden lg:block lg:col-start-1">
+                    <div class="space-y-6">
+                        <!-- Заголовок -->
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-border/30">
+                            <div class="w-6 h-6 text-primary">
+                                <svg viewBox="0 0 24 24" fill="none">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                                    <path d="M9 9H15M9 15H12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg font-semibold text-foreground font-mono">ПОКАЗАТЕЛИ</h2>
+                                <span class="text-muted-foreground text-sm">государства</span>
+                            </div>
+                        </div>
+
+                        <!-- Только статистики -->
+                        <div id="statsGrid" class="grid grid-cols-1 gap-4"></div>
+                    </div>
+                </div>
+                
+                <!-- Центральная область с карточкой -->
+                <div class="flex-1 flex flex-col gap-2 lg:gap-4 min-h-0 lg:col-start-2 relative z-10">
+                    <!-- Контекст советника -->
+                    <div id="advisorContext" class="bg-card/60 backdrop-blur-sm border border-border/30 rounded-lg p-2 lg:p-3 flex items-center gap-2 lg:gap-3">
+                        <div id="advisorAvatar" class="w-12 h-12 lg:w-12 lg:h-12 rounded-full border-2 border-accent flex items-center justify-center text-2xl cyber-glow transition-all duration-300"></div>
+                        <div class="flex-1 min-w-0">
+                            <div id="advisorName" class="text-xs lg:text-sm font-mono text-primary font-bold truncate"></div>
+                            <div id="advisorQuote" class="text-xs text-muted-foreground italic leading-tight break-words"></div>
+                        </div>
+                    </div>
+
+                    <!-- Игровая карточка с поддержкой свайпов -->
+                    <div class="flex-1 flex items-center justify-center relative min-h-0 max-w-full">
+                        <div id="gameCard" class="relative w-full max-w-sm lg:max-w-md h-full min-h-[400px] lg:min-h-[500px] flex flex-col bg-gradient-to-br from-card/80 via-card/90 to-card/95 backdrop-blur-xl border border-border/60 shadow-2xl transition-all duration-200 ease-out cursor-grab select-none hover:shadow-3xl hover:border-primary/30 rounded-lg" style="touch-action: none;">
+                            
+                            <!-- Заголовок карточки с аватаром -->
+                            <div class="flex items-center gap-4 p-4 pb-3 border-b border-border/30 flex-shrink-0">
+                                <div id="cardAdvisorAvatar" class="w-12 h-12 rounded-full border-2 border-accent flex items-center justify-center text-2xl cyber-glow"></div>
+                                
+                                <div class="flex-1 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <h3 id="cardAdvisorName" class="font-mono font-bold text-primary text-sm uppercase tracking-wide"></h3>
+                                        <div id="urgencyBadge" class="px-2 py-1 rounded-full border text-xs font-mono font-bold flex items-center gap-1"></div>
+                                    </div>
+                                    <h2 id="cardTitle" class="text-lg font-semibold text-foreground leading-tight"></h2>
+                                </div>
+                            </div>
+
+                            <!-- Контент карточки - растягивается -->
+                            <div class="p-4 space-y-4 flex-1 flex flex-col">
+                                <div id="cardDescription" class="text-sm text-muted-foreground leading-relaxed flex-1"></div>
+                                <div id="cardConsequences" class="hidden p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                                    <div class="text-xs text-primary font-mono font-bold uppercase mb-1 tracking-wide">
+                                        Возможные последствия:
+                                    </div>
+                                    <div id="consequencesText" class="text-sm text-foreground italic"></div>
+                                </div>
+                            </div>
+
+                            <!-- Кнопки выбора - с иконками вместо текста эффектов -->
+                            <div class="p-4 pt-0 space-y-3 flex-shrink-0">
+                                <button id="leftChoice" class="w-full h-auto p-4 text-left justify-start bg-gradient-to-r from-red-600/30 via-red-700/25 to-red-800/30 hover:from-red-600/40 hover:via-red-700/35 hover:to-red-800/40 dark:from-red-500/20 dark:via-red-600/15 dark:to-red-700/20 dark:hover:from-red-500/30 dark:hover:via-red-600/25 dark:hover:to-red-700/30 border border-red-600/40 hover:border-red-600/60 dark:border-red-500/30 dark:hover:border-red-500/50 text-white dark:text-red-100 font-mono text-sm leading-relaxed transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-xl space-y-2 rounded-md">
+                                    <div class="flex items-start gap-3 w-full">
+                                        <div class="text-white dark:text-red-400 font-bold text-lg flex-shrink-0">←</div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="text-white/90 dark:text-red-300 font-bold text-xs uppercase mb-1">ОТКЛОНИТЬ</div>
+                                            <div id="leftChoiceText" class="text-white dark:text-red-100 mb-2"></div>
+                                            <div id="leftChoiceEffects" class="flex flex-wrap gap-1 justify-start text-lg"></div>
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <button id="rightChoice" class="w-full h-auto p-4 text-left justify-start bg-gradient-to-r from-green-600/30 via-green-700/25 to-green-800/30 hover:from-green-600/40 hover:via-green-700/35 hover:to-green-800/40 dark:from-green-500/20 dark:via-green-600/15 dark:to-green-700/20 dark:hover:from-green-500/30 dark:hover:via-green-600/25 dark:hover:to-green-700/30 border border-green-600/40 hover:border-green-600/60 dark:border-green-500/30 dark:hover:border-green-500/50 text-white dark:text-green-100 font-mono text-sm leading-relaxed transition-all duration-200 hover:scale-[1.02] shadow-lg hover:shadow-xl space-y-2 rounded-md">
+                                    <div class="flex items-start gap-3 w-full">
+                                        <div class="text-white dark:text-green-400 font-bold text-lg flex-shrink-0">→</div>
+                                        <div class="flex-1 space-y-2">
+                                            <div class="text-white/90 dark:text-green-300 font-bold text-xs uppercase mb-1">ПРИНЯТЬ</div>
+                                            <div id="rightChoiceText" class="text-white dark:text-green-100 mb-2"></div>
+                                            <div id="rightChoiceEffects" class="flex flex-wrap gap-1 justify-start text-lg"></div>
+                                        </div>
+                                    </div>
+                                </button>
+                            </div>
+
+                            <!-- Индикаторы свайпа -->
+                            <div id="swipeIndicator" class="hidden absolute inset-0 backdrop-blur-sm flex items-center justify-center rounded-lg border-2">
+                                <div id="swipeArrow" class="text-6xl animate-bounce"></div>
+                            </div>
+
+                            <!-- Киберпанк эффекты -->
+                            <div class="absolute inset-0 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                                <div class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5 rounded-lg"></div>
+                            </div>
+                            <div class="absolute top-4 left-4 w-16 h-0.5 bg-gradient-to-r from-primary/60 to-transparent opacity-40"></div>
+                            <div class="absolute bottom-4 right-4 w-12 h-0.5 bg-gradient-to-l from-primary/60 to-transparent opacity-40"></div>
+                        </div>
+                        
+                        <!-- Индикатор стрика -->
+                        <div id="streakIndicator" class="hidden absolute top-2 lg:top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full shadow-lg animate-pulse z-20">
+                            <div class="flex items-center gap-2 font-mono font-bold">
+                                <span class="text-lg">🔥</span>
+                                <span id="streakCount">3</span>
+                                <span class="text-xs uppercase">СЕРИЯ!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая панель -->
+                <div class="hidden lg:flex lg:col-start-3 flex-col gap-4">
+                    <!-- Коррупция и популярность -->
+                    <div class="bg-card/80 backdrop-blur-md border border-border/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 pb-3 border-b border-border/30 mb-4">
+                            <div class="w-4 h-4 text-primary flex items-center justify-center">📊</div>
+                            <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">
+                                КЛЮЧЕВЫЕ МЕТРИКИ
+                            </h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="p-3 bg-gradient-to-br from-red-500/10 via-red-600/5 to-red-700/10 border border-red-500/20 rounded-xl backdrop-blur-sm">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 text-red-400 flex items-center justify-center">💰</div>
+                                        <span class="text-xs font-mono font-bold uppercase text-red-400">Коррупция</span>
+                                    </div>
+                                    <span id="corruptionValue" class="text-lg font-mono font-bold text-red-400">30%</span>
+                                </div>
+                                <div class="mt-2 h-2 bg-background/50 rounded-full overflow-hidden">
+                                    <div id="corruptionBar" class="h-full bg-gradient-to-r from-red-500 to-red-400 transition-all duration-700" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="p-3 bg-gradient-to-br from-green-500/10 via-green-600/5 to-green-700/10 border border-green-500/20 rounded-xl backdrop-blur-sm">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-4 h-4 text-green-400 flex items-center justify-center">❤️</div>
+                                        <span class="text-xs font-mono font-bold uppercase text-green-400">Популярность</span>
+                                    </div>
+                                    <span id="satisfactionValue" class="text-lg font-mono font-bold text-green-400">50%</span>
+                                </div>
+                                <div class="mt-2 h-2 bg-background/50 rounded-full overflow-hidden">
+                                    <div id="satisfactionBar" class="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all duration-700" style="width: 50%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Активные эффекты -->
+                    <div class="bg-card/80 backdrop-blur-md border border-border/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 pb-3 border-b border-border/30 mb-4">
+                            <div class="w-4 h-4 text-primary flex items-center justify-center">
+                                <svg viewBox="0 0 24 24" fill="none" class="w-full h-full">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M8 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">
+                                АКТИВНЫЕ ЭФФЕКТЫ
+                            </h3>
+                        </div>
+                        <div id="effectBadges" class="space-y-2">
+                            <div class="text-xs text-muted-foreground">Нет активных эффектов</div>
+                        </div>
+                    </div>
+
+                    <!-- Достижения -->
+                    <div class="bg-card/80 backdrop-blur-md border border-border/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 pb-3 border-b border-border/30 mb-4">
+                            <div class="w-4 h-4 text-primary flex items-center justify-center">🏆</div>
+                            <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">
+                                ДОСТИЖЕНИЯ
+                            </h3>
+                        </div>
+                        <div id="achievementBadges" class="space-y-2">
+                            <div class="text-xs text-muted-foreground">Достижения появятся здесь</div>
+                        </div>
+                    </div>
+
+                    <!-- Репутация среди стран -->
+                    <div class="bg-card/80 backdrop-blur-md border border-border/50 rounded-lg p-4">
+                        <div class="flex items-center gap-2 pb-3 border-b border-border/30 mb-4">
+                            <div class="w-4 h-4 text-primary flex items-center justify-center">🌍</div>
+                            <h3 class="text-sm font-mono font-bold text-primary uppercase tracking-wide">
+                                МИРОВАЯ РЕПУТАЦИЯ
+                            </h3>
+                        </div>
+                        <div id="worldReputation" class="space-y-3">
+                            <div class="flex items-center justify-between p-2 bg-green-500/10 border border-green-500/20 rounded">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-green-400"></div>
+                                    <span class="text-xs font-mono text-green-400">Союзники</span>
+                                </div>
+                                <span id="alliesRep" class="text-xs font-mono font-bold text-green-400">+5</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-red-500/10 border border-red-500/20 rounded">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-red-400"></div>
+                                    <span class="text-xs font-mono text-red-400">Враги</span>
+                                </div>
+                                <span id="enemiesRep" class="text-xs font-mono font-bold text-red-400">-2</span>
+                            </div>
+                            <div class="flex items-center justify-between p-2 bg-gray-500/10 border border-gray-500/20 rounded">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-gray-400"></div>
+                                    <span class="text-xs font-mono text-gray-400">Нейтральные</span>
+                                </div>
+                                <span id="neutralRep" class="text-xs font-mono font-bold text-gray-400">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Диалог окончания игры с анимацией иконки -->
+            <div id="gameEndDialog" class="hidden fixed inset-0 z-50 flex items-center justify-center p-5">
+                <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+                <div class="relative bg-card border border-border rounded-lg shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+                    <!-- Заголовок с анимированной иконкой -->
+                    <div class="p-6 text-center border-b border-border">
+                        <div id="gameEndIcon" class="text-6xl mb-4 animate-bounce"></div>
+                        <h2 id="gameEndTitle" class="text-2xl font-bold mb-4"></h2>
+                        <p id="gameEndMessage" class="text-muted-foreground"></p>
+                        
+                        <!-- Цитата результата -->
+                        <div id="gameEndQuote" class="mt-4 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <p class="italic text-primary font-mono text-sm"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 space-y-6">
+                        <!-- Анализ правления -->
+                        <div id="ruleAnalysis" class="space-y-3">
+                            <h3 class="text-lg font-bold text-primary text-center font-mono uppercase tracking-wide">
+                                Анализ правления
+                            </h3>
+                            
+                            <div class="grid grid-cols-3 gap-3">
+                                <div class="bg-secondary/30 border border-border/40 rounded-lg p-3 text-center">
+                                    <div class="w-8 h-8 text-primary mx-auto mb-2">
+                                        <svg viewBox="0 0 32 32" fill="none">
+                                            <path d="M16 4L20 12H28L22 16L24 24L16 20L8 24L10 16L4 12H12L16 4Z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-primary text-xs font-mono font-bold uppercase mb-1 tracking-wide">
+                                        Стиль
+                                    </h4>
+                                    <div id="playStyleText" class="text-foreground font-bold text-sm">
+                                        СБАЛАНСИРОВАННЫЙ
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-secondary/30 border border-border/40 rounded-lg p-3 text-center">
+                                    <div class="w-8 h-8 text-primary mx-auto mb-2">
+                                        <svg viewBox="0 0 32 32" fill="none">
+                                            <rect x="6" y="16" width="4" height="10" fill="currentColor" rx="2"/>
+                                            <rect x="14" y="8" width="4" height="18" fill="currentColor" rx="2"/>
+                                            <rect x="22" y="12" width="4" height="14" fill="currentColor" rx="2"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-primary text-xs font-mono font-bold uppercase mb-1 tracking-wide">
+                                        Приоритет
+                                    </h4>
+                                    <div id="priorityText" class="text-foreground font-bold text-sm">
+                                        ЭКОНОМИКА
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-secondary/30 border border-border/40 rounded-lg p-3 text-center">
+                                    <div class="w-8 h-8 text-primary mx-auto mb-2">
+                                        <svg viewBox="0 0 32 32" fill="none">
+                                            <path d="M16 6L18.5 13.5L26 16L18.5 18.5L16 26L13.5 18.5L6 16L13.5 13.5L16 6Z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                    <h4 class="text-primary text-xs font-mono font-bold uppercase mb-1 tracking-wide">
+                                        Направл.
+                                    </h4>
+                                    <div id="alignmentText" class="text-foreground font-bold text-sm">
+                                        ДОБРО
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 class="text-lg font-bold mb-4">ИТОГОВЫЕ ПОКАЗАТЕЛИ</h3>
+                            <div id="finalStats" class="grid grid-cols-2 gap-3"></div>
+                        </div>
+                        
+                        <!-- Компактная статистика игры в стиле React -->
+                        <div class="grid grid-cols-4 gap-2 p-3 bg-gradient-to-r from-secondary/20 via-secondary/30 to-secondary/20 rounded-lg border border-border/30">
+                            <div class="text-center">
+                                <div id="completedTermsValue" class="text-lg font-bold text-primary font-mono">1</div>
+                                <div class="text-xs text-muted-foreground font-mono uppercase tracking-wide">Сроков</div>
+                            </div>
+                            <div class="text-center">
+                                <div id="totalDecisionsValue" class="text-lg font-bold text-primary font-mono">0</div>
+                                <div class="text-xs text-muted-foreground font-mono uppercase tracking-wide">Решений</div>
+                            </div>
+                            <div class="text-center">
+                                <div id="randomEventsValue" class="text-lg font-bold text-primary font-mono">0</div>
+                                <div class="text-xs text-muted-foreground font-mono uppercase tracking-wide">События</div>
+                            </div>
+                            <div class="text-center">
+                                <div id="successRateValue" class="text-lg font-bold text-primary font-mono">100%</div>
+                                <div class="text-xs text-muted-foreground font-mono uppercase tracking-wide">Успех</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 pt-0 flex gap-4 justify-center">
+                        <button id="playAgainBtn" class="px-6 py-2 bg-primary text-primary-foreground rounded-md font-bold hover:bg-primary/90 transition-colors">
+                            🔄 ИГРАТЬ СНОВА
+                        </button>
+                        <button id="closeDialogBtn" class="px-6 py-2 bg-secondary text-secondary-foreground rounded-md font-bold hover:bg-secondary/80 transition-colors">
+                            ✕ ЗАКРЫТЬ
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Загрузка скриптов -->
+    <script src="js/constants.js"></script>
+    <script src="js/soundSystem.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>

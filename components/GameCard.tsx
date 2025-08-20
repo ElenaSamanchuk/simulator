@@ -3,7 +3,7 @@ import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { AdvisorAvatar } from './AdvisorAvatar';
 import { StatIcons } from './VectorIcons';
-import { ADVISOR_NAMES, STAT_LABELS } from '../constants/gameData';
+import { ADVISOR_BACKSTORIES, STAT_LABELS } from '../constants/gameData';
 import type { GameDecision } from '../constants/gameData';
 
 interface GameCardProps {
@@ -238,7 +238,7 @@ export function GameCard({
           <div className="flex-1 space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="font-mono font-bold text-primary text-sm uppercase tracking-wide">
-                {ADVISOR_NAMES[decision.advisor]}
+                {ADVISOR_BACKSTORIES[decision.advisor].name}
               </h3>
               
               <div className={`

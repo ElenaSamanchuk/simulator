@@ -42,25 +42,26 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.145 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.145 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.269 0 0);
-  --input: oklch(0.269 0 0);
-  --ring: oklch(0.439 0 0);
+  /* Киберпанк темная тема с акцентами на синий и фиолетовый */
+  --background: #0a0b1e; /* Темно-синий фон */
+  --foreground: #e5e7eb; /* Светло-серый текст */
+  --card: #1e1b31; /* Темно-фиолетовые карточки */
+  --card-foreground: #e5e7eb;
+  --popover: #1e1b31;
+  --popover-foreground: #e5e7eb;
+  --primary: #3b82f6; /* Ярко-синий */
+  --primary-foreground: #ffffff;
+  --secondary: #374151; /* Серый */
+  --secondary-foreground: #e5e7eb;
+  --muted: #374151;
+  --muted-foreground: #9ca3af; /* Средне-серый */
+  --accent: #8b5cf6; /* Фиолетовый акцент */
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444; /* Красный */
+  --destructive-foreground: #ffffff;
+  --border: #374151; /* Серые границы */
+  --input: #374151;
+  --ring: #8b5cf6;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --chart-1: oklch(0.488 0.243 264.376);
@@ -186,4 +187,78 @@
 
 html {
   font-size: var(--font-size);
+}
+
+/* Специальные стили для игры */
+.game-container {
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  overflow: hidden;
+}
+
+/* Убираем выделение текста для touch устройств */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Анимации */
+@keyframes card-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes achievement-shrink {
+  from { 
+    width: 100%; 
+  }
+  to { 
+    width: 0%; 
+  }
+}
+
+.card-slide-in {
+  animation: card-slide-in 0.3s ease-out;
+}
+
+.achievement-progress-bar {
+  animation: achievement-shrink 5s linear forwards;
+}
+
+/* Киберпанк эффекты */
+.cyber-glow {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.cyber-glow:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+}
+
+/* Скроллбары в темной теме */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
 }

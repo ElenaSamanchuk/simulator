@@ -590,7 +590,50 @@ export const INITIAL_COUNTRIES: CountryRelation[] = [
   }
 ];
 
+// ОСНОВНАЯ КОНФИГУРАЦИЯ ИГРЫ
+export const GAME_CONFIG = {
+  maxTerms: 5,
+  decisionsPerTerm: 10,
+  initialStats: {
+    military: 50,
+    society: 50,
+    ecology: 50,
+    economy: 50,
+    science: 50,
+    diplomacy: 50
+  },
+  initialMetrics: {
+    corruption: 30,
+    satisfaction: 50
+  },
+  minSwipeDistance: 100,
+  accumulativeThreshold: 5
+};
+
+// Названия показателей для UI
+export const STAT_LABELS = {
+  military: 'Армия',
+  society: 'Народ',
+  ecology: 'Природа',
+  economy: 'Бизнес',
+  science: 'Наука',
+  diplomacy: 'Мир'
+};
+
+// Модификаторы сложности
+export const DIFFICULTY_MODIFIERS = {
+  1: { effectMultiplier: 1.0, eventChance: 0.05, accumulativeRate: 0.5 },
+  2: { effectMultiplier: 1.1, eventChance: 0.08, accumulativeRate: 0.7 },
+  3: { effectMultiplier: 1.2, eventChance: 0.12, accumulativeRate: 1.0 },
+  4: { effectMultiplier: 1.3, eventChance: 0.15, accumulativeRate: 1.2 },
+  5: { effectMultiplier: 1.4, eventChance: 0.18, accumulativeRate: 1.5 },
+  6: { effectMultiplier: 1.5, eventChance: 0.22, accumulativeRate: 1.8 },
+  7: { effectMultiplier: 1.6, eventChance: 0.25, accumulativeRate: 2.0 },
+  8: { effectMultiplier: 1.8, eventChance: 0.30, accumulativeRate: 2.5 }
+};
+
 // ЗНАЧИТЕЛЬНО РАСШИРЕННЫЕ решения с уникальными сюжетными линиями
+
 export const GAME_DECISIONS: GameDecision[] = [
   // ПЕРВЫЙ СРОК - Знакомство с советниками и основание власти
   {
@@ -854,7 +897,7 @@ export const GAME_DECISIONS: GameDecision[] = [
   {
     id: 37,
     title: "Последнее решение",
-    description: "Ваш последний день у власти. Все советники собрались, чтобы услышать ваши заключительные слова. История будет судить вас по тому наследию, которое вы оставляете.",
+    description: "Ваш последн��й день у власти. Все советники собрались, чтобы услышать ваши заключительные слова. История будет судить вас по тому наследию, которое вы оставляете.",
     advisor: 'diplomacy',
     urgency: 'low',
     leftChoice: {
@@ -872,91 +915,3 @@ export const GAME_DECISIONS: GameDecision[] = [
 
   // Всего должно быть 40 решений (8 решений × 5 сроков)
 ];
-
-export const ADVISOR_NAMES = {
-  military: 'ГЕН. СТРАТЕГ',
-  society: 'Д-Р СОЦИУМ',
-  ecology: 'ПРОФ. ЭКО',
-  economy: 'МИН. ФИНАНСОВ',
-  science: 'ПРОФ. КОСМОС',
-  diplomacy: 'ЛЕДИ ДИПЛОМАТИЯ'
-} as const;
-
-export const STAT_LABELS = {
-  military: 'ВОЕННАЯ МОЩЬ',
-  society: 'ОБЩЕСТВО',
-  ecology: 'ЭКОЛОГИЯ',
-  economy: 'ЭКОНОМИКА',
-  science: 'НАУКА',
-  diplomacy: 'ДИПЛОМАТИЯ'
-} as const;
-
-export const GAME_CONFIG = {
-  maxTerms: 5,
-  decisionsPerTerm: 8,
-  minSwipeDistance: 80,
-  initialStats: {
-    military: 50,
-    society: 50,
-    ecology: 50,
-    economy: 50,
-    science: 50,
-    diplomacy: 50
-  },
-  initialMetrics: {
-    corruption: 30,
-    satisfaction: 50
-  },
-  randomEventChance: 0.3,
-  reputationDecayRate: 1,
-  temporaryEffectDecayRate: 1,
-  accumulativeThreshold: 3,
-  corruptionEffect: 0.1,
-  satisfactionBonus: 0.05,
-  storyBranchingEnabled: true
-} as const;
-
-export const REPUTATION_CONFIG = {
-  maxReputation: 100,
-  minReputation: -100,
-  tradeEffectMultiplier: 0.1,
-  militaryThreatThreshold: 50,
-  allianceThreshold: 60,
-  tradeAgreementThreshold: 40
-} as const;
-
-export const DIFFICULTY_MODIFIERS = {
-  1: { eventChance: 0.2, effectMultiplier: 0.8, accumulativeRate: 0.5 },
-  2: { eventChance: 0.25, effectMultiplier: 0.9, accumulativeRate: 0.7 },
-  3: { eventChance: 0.3, effectMultiplier: 1.0, accumulativeRate: 1.0 },
-  4: { eventChance: 0.35, effectMultiplier: 1.1, accumulativeRate: 1.2 },
-  5: { eventChance: 0.4, effectMultiplier: 1.2, accumulativeRate: 1.5 },
-  6: { eventChance: 0.45, effectMultiplier: 1.3, accumulativeRate: 1.8 },
-  7: { eventChance: 0.5, effectMultiplier: 1.4, accumulativeRate: 2.0 },
-  8: { eventChance: 0.6, effectMultiplier: 1.5, accumulativeRate: 2.5 }
-} as const;
-
-// Система достижений связанная с сюжетом
-export const STORY_ACHIEVEMENTS = {
-  'peaceful_ruler': {
-    id: 'peaceful_ruler',
-    name: 'МИРОТВОРЕЦ',
-    description: 'Решили 5+ конфликтов дипломатическим путем',
-    icon: '🕊️',
-    condition: (gameState: any) => gameState.peacefulResolutions >= 5
-  },
-  'iron_fist': {
-    id: 'iron_fist', 
-    name: 'ЖЕЛЕЗНАЯ РУКА',
-    description: 'Подавили 3+ протеста силой',
-    icon: '✊',
-    condition: (gameState: any) => gameState.forcefulSuppressions >= 3
-  },
-  'eco_champion': {
-    id: 'eco_champion',
-    name: 'ЗАЩИТНИК ПРИРОДЫ',
-    description: 'Предотвратили экологическую катастрофу',
-    icon: '🌱',
-    condition: (gameState: any) => gameState.ecology > 70 && gameState.preventedEcoDisaster
-  }
-} as const;
